@@ -16,47 +16,101 @@
                 color: #eee;
             }
         }
-
-        #controlArea {
-            display: flex;
-            flex-wrap: wrap;
-            font-family: monospace;
-        }
-
-        #controlArea>* {
-            flex: 1 1 auto;
-            margin: 2px;
-        }
-
-        #controlArea input {
-            width: calc(100% - 12em);
-        }
-
-        #controlArea input[type=button] {
-            font-size: 1.5em;
-        }
-
-        html,
         body {
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            padding: 0;
             margin: 0;
+            overflow: hidden;
         }
 
         #root {
             display: flex;
-            flex-flow: column;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            box-sizing: border-box;
             height: 100%;
         }
 
-        #root .headerArea {
-            flex: 0 1 auto;
+
+
+        .playerArea {
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            width: 80vw;
+            height: 50vh;
+            background-color: rgb( 0 0 0 /20%);
+            border: 1px dashed rgba(255, 255, 255, .1);
+            box-sizing: border-box;
+
+        }
+        
+
+
+
+
+        .playList {
+            margin-top: 30px;
         }
 
-        #root .playerArea {
-            flex: 1 1 auto;
-            margin: 5px;
-            padding: 5px;
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #b1a1a1;
+            border-radius: 5%;
+            background-color: #f1f1f1;
         }
+
+        .tab.active {
+            background-color: #66ccff;
+        }
+
+
+        /* 实现 tab-contents 的表格布局 */
+
+        .tab-content {
+            display: flex; /* 使用Flexbox布局 */
+            flex-wrap: wrap; /* 允许换行 */
+            justify-content: space-between; /* 均匀分布 */
+            max-height: 100vh; /* 最大高度为视口高度 */
+            overflow-y: auto; /* 超出时允许纵向滚动 */
+            padding: 10px; /* 内边距 */
+            box-sizing: border-box; /* 包含内边距和边框 */
+            height: 25vh;
+
+        }
+
+        .tab-content a {
+            flex: 1 1 calc(25% - 10px); /* 每个按钮占25%宽度，减去间距 */
+            margin: 10px; /* 按钮之间的间距 */
+            padding: 10px 0; /* 按钮内边距 */
+            background-color: #007bff; /* 按钮背景颜色 */
+            color: white; /* 按钮文字颜色 */
+            text-align: center; /* 文字居中 */
+            text-decoration: none; /* 去掉下划线 */
+            border-radius: 5px; /* 圆角 */
+            transition: background-color 0.3s; /* 背景颜色过渡效果 */
+        }
+
+        .tab-content a:hover {
+            background-color: #0056b3; /* 悬停时的背景颜色 */
+        }
+
+
+        .episode.selected {
+            background-color: #66ccff;
+            /* 选中时的背景颜色 */
+        }
+
     </style>
     <script src="./mpegts.js"></script>
     <script src="./artplayer.js"></script>
@@ -64,55 +118,321 @@
 </head>
 
 <body>
-    <div id="root">
-        <div class="headerArea">
-            <h1 style="text-align:center;margin-bottom:0">mikufans录播姬播放器</h1>
-            <p style="margin:0;text-align:center;">临时测试版</p>
-            <div id="controlArea">
-                <label for="flvpath">FLV 视频文件路径: </label>
-                <input type="text" placeholder="FLV 视频文件路径" name="flvPath" id="flvPath" onkeyup="updateXmlPath()">
-                <label for="flvpath">XML 弹幕文件路径: </label>
-                <input type="text" placeholder="XML 弹幕文件路径" name="xmlPath" id="xmlPath">
-                <input type="button" value="加载" onclick="loadFiles()">
-            </div>
-        </div>
+    <div id="root" >
         <div class="playerArea">
 
         </div>
+        <div id="quickLink">
+
+        </div>
+        <div class="playList">
+
+            <div id="tabs">
+            </div>
+            <div class="tab-container">
+                <div id="tab-contents"></div>
+            </div>
+        </div>
+
+
+
+
     </div>
+
     <script>
-        function updateXmlPath() {
-            if (flvPath.value.endsWith(".flv")) {
-                xmlPath.value = flvPath.value.slice(0, -3) + 'xml';
+        var flvPath = "";
+        var xmlPath = "";
+        const fileUrl = `#/file/`;
+        const quick = document.getElementById("quickLink");
+        quick.style = "padding-top:40px;"
+        const link1 = document.createElement('a');
+        link1.style = "padding: 10px;";
+        link1.href = `http://${window.location.host}/file`;
+        link1.textContent = '文件浏览器';
+
+        const link2 = document.createElement('a');
+        link2.style = "padding: 10px;";
+
+        link2.href = `http://${window.location.host}/ui/recorder/local/rooms`;
+        link2.textContent = '房间管理';
+
+        const link3 = document.createElement('a');
+        link3.style = "padding: 10px;";
+        link3.href = `http://${window.location.host}/ui/recorder/local/settings`;
+        link3.textContent = '设置';
+
+        const link4 = document.createElement('a');
+        link4.style = "padding: 10px;";
+        // 设置a标签的属性
+        link4.href = "#";
+        link4.textContent = "删除该文件夹";
+
+        // 添加click事件处理函数
+        link4.addEventListener("click", function() {
+            FileDelete();
+        });
+
+
+        
+        quick.appendChild(link1);
+        quick.appendChild(link2);
+        quick.appendChild(link3);
+        quick.appendChild(link4);
+
+        async function getRecordFile() {
+            let fileList = [];
+            // 定义 API 的 URL
+            const apiUrl = `http://${window.location.host}/api/file?path=%2F`;
+
+            try {
+                const data = await fetchData(apiUrl, { method: 'GET' });
+                console.log(data);
+
+                if (data.exist) {
+                    for (const element of data.files) {
+                        if (element.isFolder) {
+                            console.log(element);
+                            let name = element.name;
+                            let index = fileList.push({ [name]: [] }) - 1;
+
+                            const subData = await fetchData(`${apiUrl}${name}%2F`, { method: 'GET' });
+                            console.log(subData);
+
+                            if (subData.exist) {
+                                subData.files.forEach(j => {
+                                    if (j.name.includes(".xml") || j.name.includes(".flv")) {
+                                        fileList[index][name].push({
+                                           name: j.name,
+                                           lastModified: j.lastModified
+                               		 });
+				    }
+                                });
+                            }
+                        }
+                    }
+                }
+                // 清除值为空数组的键值对
+                for (let i = fileList.length - 1; i >= 0; i--) {
+                    for (let key in fileList[i]) {
+                        if (Array.isArray(fileList[i][key]) && fileList[i][key].length === 0) {
+                            delete fileList[i][key];
+                        }
+                    }
+
+                    // 检查对象是否为空
+                    if (Object.keys(fileList[i]).length === 0) {
+                        fileList.splice(i, 1);
+                    }
+                }
+		        // 对文件进行排序
+                fileList.forEach(folder => {
+			const key = Object.keys(folder)[0];
+			folder[key].sort((a, b) => new Date(a.lastModified) - new Date(b.lastModified));
+		});
+
+                return fileList; // 返回 FileList
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return []; // 返回空数组以防出错
             }
         }
+
+        // 动态生成标签和内容
+        const tabsContainer = document.getElementById('tabs');
+        const tabContentsContainer = document.getElementById('tab-contents');
+
+
+        getRecordFile().then(fileList => {
+            console.log('File List:', fileList);
+            fileList.forEach((item, index) => {
+                const key = Object.keys(item)[0];
+                const videos = item[key];
+
+                // 创建标签
+                const tab = document.createElement('div');
+                tab.className = 'tab';
+                tab.innerText = key;
+                tab.onclick = () => showTabContent(index);
+                tabsContainer.appendChild(tab);
+
+                // 创建内容
+                const content = document.createElement('div');
+                content.className = 'tab-content';
+                content.id = `content-${index}`;
+                videos.forEach(video => {
+                    if (video.name.includes('.flv')) {
+                        const videoItem = document.createElement('a');
+                        videoItem.title = video.name;
+                        let name = video.name;
+                        if (name.includes('.')) {
+                            name = name.split('.')[0];
+                        }
+                        if (name.length > 6) {
+                            name = name.slice('-6');
+                        }
+                        videoItem.innerHTML = `<span>${name}</span>`;
+                        videoItem.className = 'episode';
+                        // 添加点击事件
+                        videoItem.onclick = () => {
+                            // 移除所有分集元素的 selected 类
+                            const episodes = document.querySelectorAll('.episode');
+                            episodes.forEach(episode => episode.classList.remove('selected'));
+
+                            // 给当前点击的分集元素添加 selected 类
+                            event.target.classList.add('selected');
+
+                            playLink(key + '/' + video.name);
+                            loadFiles();
+                        };
+
+                        // 确保点击 span 也能触发事件
+                        videoItem.querySelector('span').onclick = (event) => {
+                            event.stopPropagation(); // 阻止事件冒泡
+                            videoItem.click(); // 触发 a 标签的点击事件
+                        };
+
+                        content.appendChild(videoItem);
+                    }
+                });
+                tabContentsContainer.appendChild(content);
+
+
+            });
+
+            showTabContent(0);
+
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+
+        function FileDelete(){
+            
+            if (window.brecArt && window.brecArt.destroy) {
+                window.brecArt.destroy();
+                window.brecArt = null;
+            }
+            const tab = document.getElementsByClassName('tab active')[0].innerText;
+            const url = `http://${window.location.host}/api/file?del=%2F${tab}`;
+
+            if (confirm(`确定要删除${tab}文件夹吗? 这将删除文件夹下所有文件！`)) {
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json(); // 返回解析后的 JSON 数据
+                        } else {
+                            throw new Error('删除失败');
+                        }
+                    })
+                    .then(data => {
+                        console.log('删除成功', data);
+                        alert('删除成功: ' + JSON.stringify(data)); // 将 JSON 数据转换为字符串
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('发生错误', error);
+                        alert('删除失败: ' + error.message);
+                    });
+
+            }
+            
+        
+        }
+
+
+        // 显示选中的标签内容
+        function showTabContent(index) {
+            // 隐藏所有内容
+            const contents = tabContentsContainer.querySelectorAll('.tab-content');
+            contents.forEach(content => content.style.display = 'none');
+
+            // 显示当前选中的内容
+            const currentContent = document.getElementById(`content-${index}`);
+            currentContent.style.display = 'flex';
+
+            // 移除所有 tab 的 active 类
+            const tabs = tabsContainer.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // 给当前选中的 tab 添加 active 类
+            tabs[index].classList.add('active');
+        }
+
+
+
+
+
+
+
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url, {
+                    method: 'GET', // 默认使用 GET 方法
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }, // 如果有请求体，则转换为 JSON 字符串
+                });
+
+                // 检查响应是否成功
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // 解析 JSON 数据
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error; // 重新抛出错误以便调用者处理
+            }
+        }
+
+        function playLink(path) {
+            flvPath = `http://${window.location.host}/file/${path}`;
+            if (flvPath.endsWith(".flv")) {
+                xmlPath = flvPath.slice(0, -3) + 'xml';
+            }
+        }
+
+
+
+
         function loadFiles() {
             if (window.brecArt && window.brecArt.destroy) {
                 window.brecArt.destroy();
                 window.brecArt = null;
             }
+            Artplayer.MOBILE_DBCLICK_PLAY = false;
             window.brecArt = new Artplayer({
                 container: '.playerArea',
-                autoplay: true,
-                url: flvPath.value,
-                pip: true,
+                screenshot: true,
                 setting: true,
+                autoplay: false,
+                url: flvPath,
+                pip: true,
                 playbackRate: true,
                 aspectRatio: true,
                 flip: true,
                 rotate: true,
-                autoSize: true,
-                autoMini: true,
+                autoSize: false,
+                autoMini: false,
+                fullscreen: true,
                 mutex: true,
                 light: true,
                 miniProgressBar: true,
                 backdrop: true,
-                fullscreen: true,
-                fullscreenWeb: true,
+                playsInline: true,
                 lang: "zh-cn",
+                lock: true, // 移动端显示一个 锁定按钮 ，用于隐藏底部 控制栏
+                fastForward: true, // 移动端添加长按视频快进功能
+                autoOrientation: true,  // 是否在移动端的网页全屏时，根据视频尺寸和视口尺寸，旋转播放器
                 plugins: [
                     artplayerPluginDanmuku({
-                        danmuku: xmlPath.value,
+                        danmuku: xmlPath,
                     }),
                 ],
                 customType: {
@@ -135,8 +455,7 @@
         ~function () {
             const path = location.hash.slice(1);
             if (path) {
-                flvPath.value = path;
-                updateXmlPath();
+                playLink(path)
                 loadFiles();
             }
         }()

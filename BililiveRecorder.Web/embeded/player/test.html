@@ -1,0 +1,138 @@
+<html class="enable-dark"><head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>录播姬播放器</title>
+    <style>
+        html {
+            font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", SimHei, sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            html.enable-dark {
+                background-color: #292a2d;
+                color: #eee;
+            }
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #root {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            box-sizing: border-box;
+            height: 100%;
+        }
+
+
+
+        .playerArea {
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            width: 80vw;
+            height: 50vh;
+            background-color: rgb( 0 0 0 /20%);
+            border: 1px dashed rgba(255, 255, 255, .1);
+            box-sizing: border-box;
+
+        }
+        
+
+
+
+
+        .playList {
+            margin-top: 30px;
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #b1a1a1;
+            border-radius: 5%;
+            background-color: #f1f1f1;
+        }
+
+        .tab.active {
+            background-color: #66ccff;
+        }
+
+
+        /* 实现 tab-contents 的表格布局 */
+
+        .tab-content {
+            display: flex; /* 使用Flexbox布局 */
+            flex-wrap: wrap; /* 允许换行 */
+            justify-content: space-between; /* 均匀分布 */
+            overflow-y: auto; /* 超出时允许纵向滚动 */
+            max-height: 100vh;
+            padding: 10px; /* 内边距 */
+            box-sizing: border-box; /* 包含内边距和边框 */
+            height: 25vh;
+        }
+
+        .tab-content a {
+            flex: 1 1 calc(25% - 10px); /* 每个按钮占25%宽度，减去间距 */
+            margin: 10px; /* 按钮之间的间距 */
+            padding: 10px 0; /* 按钮内边距 */
+            background-color: #007bff; /* 按钮背景颜色 */
+            color: white; /* 按钮文字颜色 */
+            text-align: center; /* 文字居中 */
+            text-decoration: none; /* 去掉下划线 */
+            border-radius: 5px; /* 圆角 */
+            transition: background-color 0.3s; /* 背景颜色过渡效果 */
+        }
+
+        .tab-content a:hover {
+            background-color: #0056b3; /* 悬停时的背景颜色 */
+        }
+
+
+        .episode.selected {
+            background-color: #66ccff;
+            /* 选中时的背景颜色 */
+        }
+
+    </style>
+ </head>
+
+<body>
+    <div id="root">
+        <div class="playerArea">
+
+        </div>
+        <div id="quickLink" style="padding-top: 40px;">
+
+        <a style="padding: 10px;" href="http://127.0.0.1:12333/file">文件浏览器</a><a style="padding: 10px;" href="http://127.0.0.1:12333/ui/recorder/local/rooms">房间管理</a><a style="padding: 10px;" href="http://127.0.0.1:12333/ui/recorder/local/settings">设置</a><a style="padding: 10px;" href="#">删除该文件夹</a></div>
+        <div class="playList">
+
+            <div id="tabs">
+            <div class="tab active">213333</div></div>
+            <div class="tab-container">
+                <div id="tab-contents"><div class="tab-content" id="content-0" style="display: flex;"><a title="file22.flv" class="episode"><span>file22</span></a><a title="file15.flv" class="episode"><span>file15</span></a><a title="file6.flv" class="episode"><span>file6</span></a><a title="file59.flv" class="episode"><span>file59</span></a><a title="file54.flv" class="episode"><span>file54</span></a><a title="file7.flv" class="episode"><span>file7</span></a><a title="file52.flv" class="episode"><span>file52</span></a><a title="file74.flv" class="episode"><span>file74</span></a><a title="file29.flv" class="episode"><span>file29</span></a><a title="file10.flv" class="episode"><span>file10</span></a><a title="file23.flv" class="episode"><span>file23</span></a><a title="file33.flv" class="episode"><span>file33</span></a><a title="file60.flv" class="episode"><span>file60</span></a><a title="file62.flv" class="episode"><span>file62</span></a><a title="file18.flv" class="episode"><span>file18</span></a><a title="file40.flv" class="episode"><span>file40</span></a><a title="file38.flv" class="episode"><span>file38</span></a><a title="file37.flv" class="episode"><span>file37</span></a><a title="file64.flv" class="episode"><span>file64</span></a><a title="file31.flv" class="episode"><span>file31</span></a><a title="file66.flv" class="episode"><span>file66</span></a><a title="file2.flv" class="episode"><span>file2</span></a><a title="file79.flv" class="episode"><span>file79</span></a><a title="file27.flv" class="episode"><span>file27</span></a><a title="file41.flv" class="episode"><span>file41</span></a><a title="file4.flv" class="episode"><span>file4</span></a><a title="file55.flv" class="episode"><span>file55</span></a><a title="file56.flv" class="episode"><span>file56</span></a><a title="file50.flv" class="episode"><span>file50</span></a><a title="file68.flv" class="episode"><span>file68</span></a><a title="file77.flv" class="episode"><span>file77</span></a><a title="file76.flv" class="episode"><span>file76</span></a><a title="file85.flv" class="episode"><span>file85</span></a><a title="file16.flv" class="episode"><span>file16</span></a><a title="file51.flv" class="episode"><span>file51</span></a><a title="file44.flv" class="episode"><span>file44</span></a><a title="file83.flv" class="episode"><span>file83</span></a><a title="file81.flv" class="episode"><span>file81</span></a><a title="file24.flv" class="episode"><span>file24</span></a><a title="file53.flv" class="episode"><span>file53</span></a><a title="file36.flv" class="episode"><span>file36</span></a><a title="file11.flv" class="episode"><span>file11</span></a><a title="file61.flv" class="episode"><span>file61</span></a><a title="file20.flv" class="episode"><span>file20</span></a><a title="file13.flv" class="episode"><span>file13</span></a><a title="file35.flv" class="episode"><span>file35</span></a><a title="file21.flv" class="episode"><span>file21</span></a><a title="file63.flv" class="episode"><span>file63</span></a><a title="file73.flv" class="episode"><span>file73</span></a><a title="file80.flv" class="episode"><span>file80</span></a><a title="file69.flv" class="episode"><span>file69</span></a><a title="file70.flv" class="episode"><span>file70</span></a><a title="file43.flv" class="episode"><span>file43</span></a><a title="file71.flv" class="episode"><span>file71</span></a><a title="file47.flv" class="episode"><span>file47</span></a><a title="file46.flv" class="episode"><span>file46</span></a><a title="file42.flv" class="episode"><span>file42</span></a><a title="file82.flv" class="episode"><span>file82</span></a><a title="file3.flv" class="episode"><span>file3</span></a><a title="file8.flv" class="episode"><span>file8</span></a><a title="file9.flv" class="episode"><span>file9</span></a><a title="file67.flv" class="episode"><span>file67</span></a><a title="file58.flv" class="episode"><span>file58</span></a><a title="file48.flv" class="episode"><span>file48</span></a><a title="file45.flv" class="episode"><span>file45</span></a><a title="file72.flv" class="episode"><span>file72</span></a><a title="file49.flv" class="episode"><span>file49</span></a><a title="file5.flv" class="episode"><span>file5</span></a><a title="file19.flv" class="episode"><span>file19</span></a><a title="file39.flv" class="episode"><span>file39</span></a><a title="file75.flv" class="episode"><span>file75</span></a><a title="file14.flv" class="episode"><span>file14</span></a><a title="file12.flv" class="episode"><span>file12</span></a><a title="file84.flv" class="episode"><span>file84</span></a><a title="file34.flv" class="episode"><span>file34</span></a><a title="file65.flv" class="episode"><span>file65</span></a><a title="file78.flv" class="episode"><span>file78</span></a><a title="file28.flv" class="episode"><span>file28</span></a><a title="file57.flv" class="episode"><span>file57</span></a><a title="file25.flv" class="episode"><span>file25</span></a><a title="file26.flv" class="episode"><span>file26</span></a><a title="file17.flv" class="episode"><span>file17</span></a><a title="file32.flv" class="episode"><span>file32</span></a><a title="file1.flv" class="episode"><span>file1</span></a><a title="file30.flv" class="episode"><span>file30</span></a><a title="file90.flv" class="episode"><span>file90</span></a><a title="file95.flv" class="episode"><span>file95</span></a><a title="file96.flv" class="episode"><span>file96</span></a><a title="file89.flv" class="episode"><span>file89</span></a><a title="file94.flv" class="episode"><span>file94</span></a><a title="file93.flv" class="episode"><span>file93</span></a><a title="file88.flv" class="episode"><span>file88</span></a><a title="file99.flv" class="episode"><span>file99</span></a><a title="file87.flv" class="episode"><span>file87</span></a><a title="file100.flv" class="episode"><span>ile100</span></a><a title="file97.flv" class="episode"><span>file97</span></a><a title="file98.flv" class="episode"><span>file98</span></a><a title="file86.flv" class="episode"><span>file86</span></a><a title="file91.flv" class="episode"><span>file91</span></a><a title="file92.flv" class="episode"><span>file92</span></a></div></div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+
+
+
+</body></html>

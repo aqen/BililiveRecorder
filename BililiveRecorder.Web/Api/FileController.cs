@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using BililiveRecorder.Core;
 using BililiveRecorder.Web.Models.Rest.Files;
 using Microsoft.AspNetCore.Http;
@@ -76,6 +77,78 @@ namespace BililiveRecorder.Web.Api
             }
 
             return new FileApiResult(true, path, fileLikes);
+        }
+        /// <summary>
+        /// 删除录播目录中的文件或文件夹
+        /// 仅适配windows/Linux
+        /// </summary>
+        /// <param name="del" example="/example.txt">文件路径或文件夹路径</param>
+        /// <returns></returns>
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<FileApiResult> DeleteFile([FromQuery] string del)
+        {
+            if (this.fileProvider is null || del is null)
+            {
+                return new FileApiResult(false, del ?? "", "path not found");
+            }
+
+
+            if (this.fileProvider.Root == null)
+            {
+                return new FileApiResult(false, this.fileProvider.Root ?? "", "work directory not found");
+            }
+
+	    // 判断具体平台
+	    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+	    {
+		del = del.Replace('/', '\\');
+
+	    }
+
+            var path = this.fileProvider.Root+del;
+            var fileInfo = this.fileProvider.GetFileInfo(del);
+
+            if (fileInfo.Exists)
+            {
+                // 处理文件删除
+                if (fileInfo.IsDirectory)
+                {
+                    try
+                    {
+                        System.IO.Directory.Delete(path, true); // 递归删除文件夹及其内容
+                        return new FileApiResult(true, del, "directory deleted");
+                    }
+                    catch (Exception ex)
+                    {
+                        return new FileApiResult(false, del, $"删除文件夹失败: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        System.IO.File.Delete(path);
+                        return new FileApiResult(true, del, "file deleted");
+                    }
+                    catch (Exception ex)
+                    {
+                        return new FileApiResult(false, del, $"删除文件失败: {ex.Message}");
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    System.IO.Directory.Delete(path, true); // 递归删除文件夹及其内容
+                    return new FileApiResult(true, del, "directory deleted");
+                }
+                catch (Exception ex)
+                {
+                    return new FileApiResult(false, del, $"删除文件夹失败: {ex.Message}");
+                }
+            }
         }
 
         private void Dispose(bool disposing)
